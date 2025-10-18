@@ -1,0 +1,17 @@
+<!doctype html><html><body style="font:12px system-ui;margin:12px">
+  <h3>PoW Importer</h3>
+  <button id="load">Load from Clipboard</button>
+  <button id="importBtn">Import</button>
+  <div id="status" style="margin-top:8px;color:#555"></div>
+  <script>
+    let planText = '';
+    document.getElementById('load').onclick = async () => {
+      try { planText = await navigator.clipboard.readText(); status.textContent = planText ? '✅ Plan loaded from clipboard' : '⚠️ Clipboard empty'; }
+      catch(e){ status.textContent = '❌ Cannot read clipboard (browser permission)'; }
+    };
+    document.getElementById('importBtn').onclick = () => {
+      if(!planText) { status.textContent = '⚠️ Load plan first'; return; }
+      parent.postMessage({ pluginMessage: { type: 'import', text: planText } }, '*');
+    };
+  </script>
+</body></html>

@@ -1,0 +1,18 @@
+{
+  "name": "pow",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "run": "tsx cli/run.ts",
+    "plan:copy": "npm run run -- \"Login with SSO, 2FA, and error state\" && pbcopy < docs/flow.plan.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

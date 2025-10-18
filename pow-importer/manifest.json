@@ -1,0 +1,12 @@
+{
+  "name": "Planktonat0r",
+  "id": "1561174940716521208",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "permissions": [
+    // Remove camera, microphone, display-capture if not needed
+    // Only include clipboard-read if you need to read from clipboard
+    "clipboard-read"
+  ]
+}
