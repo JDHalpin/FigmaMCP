@@ -1,24 +1,82 @@
 <!doctype html>
 <html>
-  <body style="font:12px system-ui;margin:12px;line-height:1.4">
-    <h3 style="margin:0 0 8px">PoW Importer</h3>
+  <head>
+    <style>
+      body { font-family: Inter, sans-serif; padding: 20px; margin: 0; line-height: 1.4; }
+      h3 { margin: 0 0 12px; }
+      textarea { width: 100%; height: 150px; border: 1px solid #ddd; border-radius: 4px; padding: 10px; box-sizing: border-box; }
+      button { background: #18A0FB; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+      button:hover { background: #0D7BD6; }
+      label { display: block; font-size: 12px; margin-top: 12px; color: #333; }
+      input[type="text"], input[type="number"] { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 4px; box-sizing: border-box; }
+      .section { border: 1px solid #eee; border-radius: 6px; padding: 16px; margin-top: 16px; }
+      .section h4 { margin: 0 0 12px; font-size: 16px; }
+      .actions { margin-top: 10px; display: flex; align-items: center; gap: 8px; }
+      #status, #annotation-status { color: #666; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <h3>PoW Importer</h3>
 
-    <p style="margin:0 0 6px">
-      1) In Terminal: <code>cd ~/Projects/pow && npm run run -- "Login with SSO, 2FA, and error state"</code><br>
-      2) Open <code>pow/docs/flow.plan.json</code>, copy all text<br>
-      3) Paste below, then click <b>Import</b>
-    </p>
+    <div class="section">
+      <h4>Plan JSON Import</h4>
+      <p style="margin:0 0 6px">Paste a generated plan JSON to render frames.</p>
+      <textarea id="jsonInput" placeholder='{"screens": [{"name": "Home", "size": {"w": 1440, "h": 1024}, "blocks": [{"type": "header", "title": "Acme"}]}]}'></textarea>
+      <div class="actions">
+        <button id="import">Import</button>
+        <span id="status"></span>
+      </div>
+    </div>
 
-    <textarea id="input" style="width:460px;height:220px"></textarea><br/>
-    <button id="import">Import</button>
-    <span id="status" style="margin-left:8px;color:#666"></span>
+    <div class="section">
+      <h4>Functional Annotation Generator</h4>
+      <label>Brand</label>
+      <input id="brand" type="text" placeholder="Acme" />
+
+      <label>Project name</label>
+      <input id="project" type="text" placeholder="Carbon Redesign" />
+
+      <label>Document additional field</label>
+      <input id="docExtra" type="text" placeholder="Release 1" />
+
+      <label>Base page name</label>
+      <input id="pageBase" type="text" placeholder="Page" />
+
+      <label>Page additional field</label>
+      <input id="pageExtra" type="text" placeholder="*additional field" />
+
+      <label>Number of frames</label>
+      <input id="frameCount" type="number" min="1" value="1" />
+
+      <div class="actions">
+        <button id="createAnnotation">Create Frames</button>
+        <span id="annotation-status"></span>
+      </div>
+    </div>
 
     <script>
-      const status = document.getElementById('status');
-      document.getElementById('import').onclick = () => {
-        const text = document.getElementById('input').value;
+      const $ = (id) => document.getElementById(id);
+
+      $('import').onclick = () => {
+        const text = $('jsonInput').value;
+        const status = $('status');
         if (!text.trim()) { status.textContent = '⚠️ Paste JSON first'; return; }
         parent.postMessage({ pluginMessage: { type: 'import', text } }, '*');
+        status.textContent = 'Sent';
+      };
+
+      $('createAnnotation').onclick = () => {
+        const payload = {
+          type: 'create-annotations',
+          frameCount: $('frameCount').value,
+          brand: $('brand').value.trim(),
+          project: $('project').value.trim(),
+          docExtra: $('docExtra').value.trim(),
+          pageBase: $('pageBase').value.trim(),
+          pageExtra: $('pageExtra').value.trim(),
+        };
+        parent.postMessage({ pluginMessage: payload }, '*');
+        $('annotation-status').textContent = 'Sent';
       };
     </script>
   </body>
