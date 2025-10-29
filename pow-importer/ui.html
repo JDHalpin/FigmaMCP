@@ -1,17 +1,25 @@
-<!doctype html><html><body style="font:12px system-ui;margin:12px">
-  <h3>PoW Importer</h3>
-  <button id="load">Load from Clipboard</button>
-  <button id="importBtn">Import</button>
-  <div id="status" style="margin-top:8px;color:#555"></div>
-  <script>
-    let planText = '';
-    document.getElementById('load').onclick = async () => {
-      try { planText = await navigator.clipboard.readText(); status.textContent = planText ? '✅ Plan loaded from clipboard' : '⚠️ Clipboard empty'; }
-      catch(e){ status.textContent = '❌ Cannot read clipboard (browser permission)'; }
-    };
-    document.getElementById('importBtn').onclick = () => {
-      if(!planText) { status.textContent = '⚠️ Load plan first'; return; }
-      parent.postMessage({ pluginMessage: { type: 'import', text: planText } }, '*');
-    };
-  </script>
-</body></html>
+<!doctype html>
+<html>
+  <body style="font:12px system-ui;margin:12px;line-height:1.4">
+    <h3 style="margin:0 0 8px">PoW Importer</h3>
+
+    <p style="margin:0 0 6px">
+      1) In Terminal: <code>cd ~/Projects/pow && npm run run -- "Login with SSO, 2FA, and error state"</code><br>
+      2) Open <code>pow/docs/flow.plan.json</code>, copy all text<br>
+      3) Paste below, then click <b>Import</b>
+    </p>
+
+    <textarea id="input" style="width:460px;height:220px"></textarea><br/>
+    <button id="import">Import</button>
+    <span id="status" style="margin-left:8px;color:#666"></span>
+
+    <script>
+      const status = document.getElementById('status');
+      document.getElementById('import').onclick = () => {
+        const text = document.getElementById('input').value;
+        if (!text.trim()) { status.textContent = '⚠️ Paste JSON first'; return; }
+        parent.postMessage({ pluginMessage: { type: 'import', text } }, '*');
+      };
+    </script>
+  </body>
+</html>
