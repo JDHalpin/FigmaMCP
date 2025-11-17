@@ -1,5 +1,7 @@
 # Figma MCP Toolkit ("PoW")
 
+*Connect to Figma to generate new frames and components.*
+
 ## Overview
 - `pow/`: TypeScript CLI that turns a natural-language intent into a structured flow plan (`docs/flow.plan.json`).
 - `pow-importer/`: Companion Figma plugin that imports the plan or generates annotation frames.
