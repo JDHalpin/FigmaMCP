@@ -6,7 +6,8 @@
   "scripts": {
     "run": "tsx cli/run.ts",
     "plan:copy": "npm run run -- \"Login with SSO, 2FA, and error state\" && pbcopy < docs/flow.plan.json",
-    "mcp:smoke": "tsx src/figma/mcp-smoke.ts"
+    "mcp:smoke": "tsx src/figma/mcp-smoke.ts",
+    "mcp:file": "tsx src/figma/fetch-file-summary.ts"
   },
   "keywords": [],
   "author": "",

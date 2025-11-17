@@ -2,23 +2,79 @@
 <html>
   <head>
     <style>
-      body { font-family: Inter, sans-serif; padding: 20px; margin: 0; line-height: 1.4; }
-      h3 { margin: 0 0 12px; }
-      textarea { width: 100%; height: 150px; border: 1px solid #ddd; border-radius: 4px; padding: 10px; box-sizing: border-box; }
-      button { background: #18A0FB; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+      html, body { height: 100%; }
+      body {
+        font-family: Inter, sans-serif;
+        padding: 20px;
+        margin: 0;
+        line-height: 1.4;
+        background: #f5f6f9;
+        color: #1f2430;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      h3 { margin: 0; font-size: 22px; }
+      textarea {
+        width: 100%;
+        height: 180px;
+        border: 1px solid #cfd4dc;
+        border-radius: 6px;
+        padding: 10px;
+        box-sizing: border-box;
+        background: #fff;
+      }
+      button {
+        background: #18A0FB;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
       button:hover { background: #0D7BD6; }
       label { display: block; font-size: 12px; margin-top: 12px; color: #333; }
-      input[type="text"], input[type="number"] { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 4px; box-sizing: border-box; }
-      .section { border: 1px solid #eee; border-radius: 6px; padding: 16px; margin-top: 16px; }
+      input[type="text"], input[type="number"] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #cfd4dc;
+        border-radius: 4px;
+        margin-top: 4px;
+        box-sizing: border-box;
+        background: #fff;
+      }
+      .panel {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 6px;
+      }
+      .section {
+        border: 1px solid #e2e6ed;
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 16px;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(31, 36, 48, 0.12);
+      }
+      .section:first-of-type { margin-top: 0; }
       .section h4 { margin: 0 0 12px; font-size: 16px; }
       .actions { margin-top: 10px; display: flex; align-items: center; gap: 8px; }
       #status, #annotation-status { color: #666; font-size: 12px; }
+      .subtle { font-size: 12px; color: #5a6270; margin: 4px 0 0; }
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 4px; }
+      ::-webkit-scrollbar-thumb { background: #b5bcc8; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #8f97a3; }
     </style>
   </head>
   <body>
-    <h3>PoW Importer</h3>
+    <header>
+      <h3>PoW Importer</h3>
+      <p class="subtle">Import existing plans or spin up annotation frames in one click.</p>
+    </header>
 
-    <div class="section">
+    <main class="panel">
+      <div class="section">
       <h4>Plan JSON Import</h4>
       <p style="margin:0 0 6px">Paste a generated plan JSON to render frames.</p>
       <textarea id="jsonInput" placeholder='{"screens": [{"name": "Home", "size": {"w": 1440, "h": 1024}, "blocks": [{"type": "header", "title": "Acme"}]}]}'></textarea>
@@ -26,9 +82,9 @@
         <button id="import">Import</button>
         <span id="status"></span>
       </div>
-    </div>
+      </div>
 
-    <div class="section">
+      <div class="section">
       <h4>Functional Annotation Generator</h4>
       <label>Brand</label>
       <input id="brand" type="text" placeholder="Acme" />
@@ -52,7 +108,8 @@
         <button id="createAnnotation">Create Frames</button>
         <span id="annotation-status"></span>
       </div>
-    </div>
+      </div>
+    </main>
 
     <script>
       const $ = (id) => document.getElementById(id);

@@ -1,7 +1,7 @@
 // Minimal, stable importer: creates frames + text labels from pasted JSON.
 // No external libs, no top-level await.
 
-figma.showUI(__html__, { width: 520, height: 360 });
+figma.showUI(__html__, { width: 520, height: 560 });
 
 let fontLoaded = false;
 
