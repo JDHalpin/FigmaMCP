@@ -1,4 +1,4 @@
-# Figma MCP Toolkit ("PoW")
+# Figma Wireframe toolkit (plugin, MCP framework)
 
 *Connect to Figma to generate new frames and components.*
 
