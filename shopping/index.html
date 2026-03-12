@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Shopping List</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide-static/0.383.0/lucide.min.css">
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        function ShoppingList() {
+            const [items, setItems] = useState([]);
+            const [newItem, setNewItem] = useState('');
+            const [category, setCategory] = useState('Other');
+            const [listId, setListId] = useState('');
+            const [shareUrl, setShareUrl] = useState('');
+
+            const categories = ['Produce', 'Dairy', 'Meat', 'Pantry', 'Other'];
+
+            // Initialize list from URL hash or localStorage
+            useEffect(() => {
+                const hash = window.location.hash.substring(1);
+                const currentListId = hash || `list-${Date.now()}`;
+                setListId(currentListId);
+
+                // Load from localStorage
+                const stored = localStorage.getItem(currentListId);
+                if (stored) {
+                    setItems(JSON.parse(stored));
+                }
+
+                // Update URL if needed
+                if (!hash) {
+                    window.location.hash = currentListId;
+                }
+
+                // Generate share URL
+                const url = `${window.location.origin}${window.location.pathname}#${currentListId}`;
+                setShareUrl(url);
+
+                // Listen for storage changes (for real-time sync)
+                const handleStorage = (e) => {
+                    if (e.key === currentListId && e.newValue) {
+                        setItems(JSON.parse(e.newValue));
+                    }
+                };
+
+                window.addEventListener('storage', handleStorage);
+                return () => window.removeEventListener('storage', handleStorage);
+            }, []);
+
+            // Save to localStorage whenever items change
+            useEffect(() => {
+                if (listId) {
+                    localStorage.setItem(listId, JSON.stringify(items));
+                    // Trigger storage event for other tabs
+                    window.dispatchEvent(new StorageEvent('storage', {
+                        key: listId,
+                        newValue: JSON.stringify(items)
+                    }));
+                }
+            }, [items, listId]);
+
+            const addItem = () => {
+                if (newItem.trim()) {
+                    setItems([...items, {
+                        id: Date.now(),
+                        name: newItem,
+                        category,
+                        checked: false
+                    }]);
+                    setNewItem('');
+                }
+            };
+
+            const toggleItem = (id) => {
+                setItems(items.map(item =>
+                    item.id === id ? { ...item, checked: !item.checked } : item
+                ));
+            };
+
+            const deleteItem = (id) => {
+                setItems(items.filter(item => item.id !== id));
+            };
+
+            const copyShareLink = () => {
+                navigator.clipboard.writeText(shareUrl);
+                alert('Share link copied to clipboard!');
+            };
+
+            const groupedItems = categories.reduce((acc, cat) => {
+                acc[cat] = items.filter(item => item.category === cat);
+                return acc;
+            }, {});
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+                    <div className="max-w-2xl mx-auto">
+                        <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
+                            <h1 className="text-3xl font-bold text-gray-800 mb-2">Shared Shopping List</h1>
+                            
+                            <div className="flex gap-2 mb-4">
+                                <button
+                                    onClick={copyShareLink}
+                                    className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                                >
+                                    📋 Copy Share Link
+                                </button>
+                            </div>
+
+                            <div className="text-sm text-gray-600 mb-4 p-3 bg-blue-50 rounded-lg">
+                                <strong>How to share:</strong> Click "Copy Share Link" and send it to your shopping partner. You'll both see the same list!
+                            </div>
+
+                            <div className="flex gap-2 mb-6">
+                                <input
+                                    type="text"
+                                    value={newItem}
+                                    onChange={(e) => setNewItem(e.target.value)}
+                                    onKeyPress={(e) => e.key === 'Enter' && addItem()}
+                                    placeholder="Add item..."
+                                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                />
+                                <select
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)}
+                                    className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                >
+                                    {categories.map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
+                                <button
+                                    onClick={addItem}
+                                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                                >
+                                    Add
+                                </button>
+                            </div>
+
+                            {categories.map(cat => {
+                                const categoryItems = groupedItems[cat];
+                                if (categoryItems.length === 0) return null;
+
+                                return (
+                                    <div key={cat} className="mb-6">
+                                        <h2 className="text-lg font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                                            <span className="w-2 h-2 bg-indigo-500 rounded-full"></span>
+                                            {cat}
+                                        </h2>
+                                        <div className="space-y-2">
+                                            {categoryItems.map(item => (
+                                                <div
+                                                    key={item.id}
+                                                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={item.checked}
+                                                        onChange={() => toggleItem(item.id)}
+                                                        className="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500"
+                                                    />
+                                                    <span className={`flex-1 ${item.checked ? 'line-through text-gray-400' : 'text-gray-800'}`}>
+                                                        {item.name}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => deleteItem(item.id)}
+                                                        className="text-red-500 hover:text-red-700 transition-colors font-medium"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+
+                            {items.length === 0 && (
+                                <div className="text-center py-12 text-gray-400">
+                                    <p className="text-lg">Your shopping list is empty</p>
+                                    <p className="text-sm">Add items above to get started!</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<ShoppingList />, document.getElementById('root'));
+    </script>
+</body>
+</html>
